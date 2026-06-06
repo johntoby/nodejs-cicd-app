@@ -1,0 +1,27 @@
+name: Upload Books to S3
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Upload books to S3
+        run: |
+          aws s3 cp "BTA-CICD-LECTURE-NOTES.pdf" s3://${{ secrets.S3_BUCKET_NAME }}/
+          aws s3 cp "Linux-book.pdf" s3://${{ secrets.S3_BUCKET_NAME }}/
+          aws s3 cp "Linux-Cheat-Sheet-Sponsored-By-Loggly.pdf" s3://${{ secrets.S3_BUCKET_NAME }}/
